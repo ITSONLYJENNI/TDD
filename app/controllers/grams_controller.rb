@@ -1,5 +1,12 @@
 class GramsController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create]
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
+
+  def destroy
+    @gram = Gram.find_by_id(params[:id])
+    return render_not_found if @gram.blank?
+    @gram.destroy
+    redirect_to root_path
+  end
 
   def update
     @gram = Gram.find_by_id(params[:id])
@@ -15,6 +22,7 @@ class GramsController < ApplicationController
   end
 
   def index
+    @grams = Gram.all
   end
 
   def edit
@@ -44,7 +52,7 @@ class GramsController < ApplicationController
   private
 
   def gram_params
-    params.require(:gram).permit(:message)
+    params.require(:gram).permit(:message, :picture)
   end
 
   def render_not_found
