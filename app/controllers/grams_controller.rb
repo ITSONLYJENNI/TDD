@@ -4,6 +4,9 @@ class GramsController < ApplicationController
   def destroy
     @gram = Gram.find_by_id(params[:id])
     return render_not_found if @gram.blank?
+    if @gram.user != current_user
+      return render plain: 'Forbidden :(', status: :forbidden
+    end
     @gram.destroy
     redirect_to root_path
   end
@@ -11,9 +14,10 @@ class GramsController < ApplicationController
   def update
     @gram = Gram.find_by_id(params[:id])
     return render_not_found if @gram.blank?
-
+    if @gram.user != current_user
+      return render plain: 'Forbidden :(', status: :forbidden
+    end
     @gram.update_attributes(gram_params)
-
     if @gram.valid?
       redirect_to root_path
     else
@@ -28,12 +32,17 @@ class GramsController < ApplicationController
   def edit
     @gram = Gram.find_by_id(params[:id])
     return render_not_found if @gram.blank?
+    if @gram.user != current_user
+      render plain: 'Forbidden :(', status: :forbidden
+    end
   end
 
   def show
     @gram = Gram.find_by_id(params[:id])
+    @gram = Gram.new
     if @gram.blank?
     return render_not_found if @gram.blank?
+    end
   end
 
   def new
@@ -55,7 +64,7 @@ class GramsController < ApplicationController
     params.require(:gram).permit(:message, :picture)
   end
 
-  def render_not_found
-    render plain: 'Not Found :(', status: :not_found
-  end
+  # def render_not_found
+  #   render plain: 'Not Found :(', status: :not_found
+  # end
 end
